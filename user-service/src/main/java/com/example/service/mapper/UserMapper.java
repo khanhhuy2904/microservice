@@ -10,10 +10,8 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    // Mapping từ entity sang dto
     UserDTO toDTO(User user);
 
-    // Mapping ngược lại
     User toEntity(UserDTO userDTO);
 }
 
