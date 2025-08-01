@@ -1,10 +1,11 @@
 package com.example.service;
 
 import com.example.dto.UserDTO;
+import com.example.entity.User;
 
 import java.util.Optional;
 
 public interface UserService {
     UserDTO getUserById(Long id);
-    UserDTO createUser(UserDTO userDTO);
+    User createUser(User user);
 }

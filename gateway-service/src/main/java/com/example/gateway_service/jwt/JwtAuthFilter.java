@@ -25,7 +25,7 @@ public class JwtAuthFilter implements GlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
         if (request.getURI().getPath().contains("/auth/login")) {
             return chain.filter(exchange);
-        }
+    }
 
         List<String> authHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
 
@@ -40,7 +40,7 @@ public class JwtAuthFilter implements GlobalFilter {
             System.out.println("✅ Claims: " + claims);
 
             ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("userId", claims.getSubject())
+                    .header("username", claims.getSubject())
                     .header("role", claims.get("role", String.class))
                     .build();
 

@@ -4,6 +4,7 @@ import com.example.dto.ProductDTO;
 import com.example.dto.UserDTO;
 import com.example.entity.Product;
 import com.example.repository.ProductRepository;
+import com.example.service.ExcelImportService;
 import com.example.service.ProductService;
 import com.example.service.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,8 +23,13 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private ProductMapper productMapper;
+    @Autowired
+    private ExcelImportService excelImportService;
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ProductDTO>> getAll() {
+        return ResponseEntity.ok(productService.getAllProducts());
+    }
     @GetMapping("/check-user/{userId}")
     public String checkUser(@PathVariable Long userId) {
         return productService.checkUser(userId);
@@ -29,15 +37,36 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        ProductDTO response = productService.getProductById(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
-        ProductDTO created = productService.createProduct(productDTO);
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        Product created = productService.createProduct(product);
         return ResponseEntity.ok(created);
     }
+
+    @PostMapping("/{id}/deduct")
+    public ResponseEntity<Void> deductStock(@PathVariable Long id,
+                                            @RequestParam int quantity) {
+        try {
+            productService.deductStock(id, quantity);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/import-excel")
+    public ResponseEntity<String> importExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            excelImportService.importExcel(file);
+            return ResponseEntity.ok("Import thành công");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+        }
+    }
+
 }
 

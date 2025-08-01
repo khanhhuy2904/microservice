@@ -23,16 +23,15 @@ public class HeaderAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String userId = request.getHeader("userId");
+        String username = request.getHeader("username");
         String role = request.getHeader("role");
 
-        if (userId != null && role != null) {
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    userId, null, List.of(authority)
-            );
+        if (username     != null && role != null) {
+            var authority = new SimpleGrantedAuthority(role);
+            var auth = new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(authority));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
+        filterChain.doFilter(request, response);
     }
 }
 

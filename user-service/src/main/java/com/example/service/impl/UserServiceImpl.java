@@ -25,11 +25,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        User userEntity = userMapper.toEntity(userDTO);
-        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-        userEntity.setPassword(encodedPassword);
-        User savedUser = userRepository.save(userEntity);
-        return userMapper.toDTO(savedUser);
+    public User createUser(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        return userRepository.save(user);
+
     }
 }
